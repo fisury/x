@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Namora comigo?</title>
+    <style>
+        :root {
+            --bg-1: #fff1f2;
+            --bg-2: #ffd7e2;
+            --card: rgba(255, 255, 255, 0.72);
+            --text: #4a1630;
+            --primary: #ff4d8d;
+            --primary-dark: #d63372;
+            --secondary: #fff;
+            --shadow: 0 20px 50px rgba(160, 39, 89, 0.18);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            overflow: hidden;
+            font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top, rgba(255, 255, 255, 0.95), transparent 38%),
+                linear-gradient(135deg, var(--bg-1), var(--bg-2));
+        }
+
+        .hearts {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.55;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: clamp(18px, 2vw, 28px);
+            animation: floatUp linear infinite;
+        }
+
+        @keyframes floatUp {
+            from {
+                transform: translateY(20px) scale(0.9);
+                opacity: 0;
+            }
+
+            20% {
+                opacity: 1;
+            }
+
+            to {
+                transform: translateY(-120vh) scale(1.1);
+                opacity: 0;
+            }
+        }
+
+        .wrap {
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+        }
+
+        .card {
+            width: min(92vw, 560px);
+            padding: 40px 28px;
+            border-radius: 28px;
+            text-align: center;
+            background: var(--card);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.65);
+            position: relative;
+        }
+
+        .badge {
+            display: inline-block;
+            margin-bottom: 18px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: rgba(255, 77, 141, 0.12);
+            color: var(--primary-dark);
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            line-height: 1.05;
+            margin-bottom: 14px;
+        }
+
+        p {
+            font-size: 1.05rem;
+            line-height: 1.6;
+            max-width: 34ch;
+            margin: 0 auto;
+        }
+
+        .actions {
+            position: relative;
+            height: 160px;
+            margin-top: 34px;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 999px;
+            padding: 14px 24px;
+            min-width: 120px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+            box-shadow: 0 12px 24px rgba(214, 51, 114, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-yes {
+            background: var(--primary);
+            color: #fff;
+            position: absolute;
+            left: 50%;
+            top: 24px;
+            transform: translateX(-140%);
+        }
+
+        .btn-yes:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-no {
+            background: var(--secondary);
+            color: var(--primary-dark);
+            position: absolute;
+            left: 50%;
+            top: 24px;
+            transform: translateX(20%);
+        }
+
+        .footer {
+            margin-top: 24px;
+            font-size: 0.95rem;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 520px) {
+            .card {
+                padding: 32px 20px;
+            }
+
+            .actions {
+                height: 200px;
+            }
+
+            .btn-yes {
+                transform: translateX(-120%);
+            }
+
+            .btn-no {
+                transform: translateX(10%);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hearts" aria-hidden="true"></div>
+    <iframe name="discordWebhookFrame" style="display: none;" aria-hidden="true"></iframe>
+
+    <main class="wrap">
+        <section class="card">
+            <span class="badge">Oi risos!</span>
+            <h1>Aceita namorar comigo?</h1>
+            <p>
+talvez eu não seja o melhor namorado do mundo, mas prometo que vou me esforçar muito pra te fazer feliz e te apoiar em tudo. Vamos viver momentos incríveis juntos e construir uma história linda de amor e companheirismo. Aceita ser minha namorada?
+            </p>
+
+            <div class="actions" id="actions">
+                <button class="btn btn-yes" type="button" onclick="aceitar()">SIM</button>
+                <button class="btn btn-no" id="btnNo" type="button" onmouseover="desviar()" onclick="desviar()">NAO</button>
+            </div>
+
+            <div class="footer">Dica: o botao da esquerda costuma ser a melhor escolha.</div>
+        </section>
+    </main>
+
+    <script>
+        const playlistUrl = "https://www.youtube.com/playlist?list=PLec-IOjohyFetYtCTiSj1_ZgvPYRviKIf";
+        const webhookUrl = "https://discord.com/api/webhooks/1496310427754434661/YpVODZJdwc7oRcliufE486uw7AnIj0l0LoqgEUdCayyImfPAXIcIpnR3BD5I2VBu9NlX";
+        const btnNo = document.getElementById("btnNo");
+        const area = document.getElementById("actions");
+        const hearts = document.querySelector(".hearts");
+
+        function enviarWebhookDiscord() {
+            const form = document.createElement("form");
+            const input = document.createElement("input");
+
+            form.method = "POST";
+            form.action = webhookUrl;
+            form.target = "discordWebhookFrame";
+            form.style.display = "none";
+            form.enctype = "multipart/form-data";
+
+            input.type = "hidden";
+            input.name = "content";
+            input.value = "Ela aceitou namorar com voce! Hora de comemorar. <3>";
+
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+
+            setTimeout(() => {
+                form.remove();
+            }, 1000);
+        }
+
+        function aceitar() {
+            alert("Voce aceitou! Agora eu preparei uma playlist especial pra esse momento.");
+            enviarWebhookDiscord();
+            setTimeout(() => {
+                window.location.href = playlistUrl;
+            }, 400);
+        }
+
+        function desviar() {
+            const areaRect = area.getBoundingClientRect();
+            const btnRect = btnNo.getBoundingClientRect();
+
+            const maxLeft = Math.max(0, areaRect.width - btnRect.width);
+            const maxTop = Math.max(10, areaRect.height - btnRect.height);
+
+            const left = Math.random() * maxLeft;
+            const top = 10 + Math.random() * (maxTop - 10);
+
+            btnNo.style.left = left + "px";
+            btnNo.style.top = top + "px";
+            btnNo.style.transform = "none";
+        }
+
+        function criarCoracoes() {
+            const total = 16;
+
+            for (let i = 0; i < total; i += 1) {
+                const heart = document.createElement("span");
+                heart.className = "heart";
+                heart.textContent = "❤";
+                heart.style.left = Math.random() * 100 + "vw";
+                heart.style.top = Math.random() * 100 + "vh";
+                heart.style.animationDuration = 6 + Math.random() * 8 + "s";
+                heart.style.animationDelay = Math.random() * 5 + "s";
+                hearts.appendChild(heart);
+            }
+        }
+
+        criarCoracoes();
+    </script>
+</body>
+</html>
